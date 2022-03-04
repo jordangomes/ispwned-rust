@@ -1,0 +1,15 @@
+[package]
+name = "ispwned-rust"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+rust-crypto="0.2.36"
+memmap="0.7.0"
+linecount="0.1.0"
+indicatif="0.16.2"
+chrono="0.4.19"
+chrono-humanize="0.2.1"
+keepass="0.4.9"
