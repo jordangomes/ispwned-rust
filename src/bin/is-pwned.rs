@@ -3,10 +3,9 @@ use keepass::{Database, NodeRef};
 use std::{
     env,
     fs::File,
-    io::{BufRead, Read},
+    io::{BufRead},
     time::{ Instant }
 };
-use memmap::{ Mmap };
 use crypto::{
     digest::Digest,
     sha1::Sha1
@@ -36,14 +35,11 @@ fn main() {
 
 fn check_passwords_from_file(password_file_path:&String, log:bool) -> (i32, i32) {
     let file = File::open(password_file_path).expect("Error opening file");
-    let mmap = unsafe { Mmap::map(&file).expect("Error mapping file") };
-    let mut reader: Box<dyn Read>;
-    reader = Box::new(&mmap[..]);
     
     let mut lines = 0;
     let mut found = 0;
 
-    for line in std::io::BufReader::new(reader.as_mut()).lines() {
+    for line in std::io::BufReader::new(file).lines() {
         let password = line.unwrap();
         if check_password(&password, false) {
             if log { 
@@ -73,7 +69,7 @@ fn check_password_from_keepass_db(db:&String, password:&String) {
                 let user = e.get_username().unwrap();
                 let pass = e.get_password().unwrap();
                 if check_password(&pass.to_string(), false) {
-                    println!("Comprimised Entry '{0}': '{1}'", title, user);
+                    println!("Compromised Entry '{0}': '{1}'", title, user);
                 }
             }
         }
@@ -93,11 +89,8 @@ fn check_password(password:&String, log:bool) -> bool {
     }
 
     let file = File::open(hash_file_path).expect("Error opening file");
-    let mmap = unsafe { Mmap::map(&file).expect("Error mapping file") };
-    let mut reader: Box<dyn Read>;
-    reader = Box::new(&mmap[..]);
 
-    for line in std::io::BufReader::new(reader.as_mut()).lines() {
+    for line in std::io::BufReader::new(file).lines() {
         let suffix = line.unwrap();
         if suffix == hash_suffix {
             return true
